@@ -1,0 +1,169 @@
+#pragma once
+
+#include "Game/Game.h"
+#include "IO/Log.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <memory>
+#include <exception>
+#include <chrono>
+
+#define AA_SAMPLES      16
+
+class Window
+{
+private:
+    static void SizeChangeCallback(
+        GLFWwindow *handle,
+        int width,
+        int height)
+    {
+        glViewport(0, 0, width, height);
+    }
+
+    static void KeyCallback(
+        GLFWwindow* handle,
+        int key,
+        int scancode,
+        int action,
+        int mods)
+    {
+        // Invalid key input
+        if (key < 0)
+        {
+            return;
+        }
+
+        auto windowPtr = static_cast<Window*>(
+            glfwGetWindowUserPointer(handle)
+        );
+
+        switch(action)
+        {
+            case GLFW_PRESS:
+                windowPtr->m_game->OnKeyPressed(key);
+            case GLFW_RELEASE:
+                windowPtr->m_game->OnKeyReleased(key);
+            default:
+                break;
+        }
+    }
+
+public:
+    static void GLAPIENTRY MessageCallback(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* userParam)
+    {
+        fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (
+                type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+                type, severity, message);
+    }
+
+public:
+    void CreateWindow(int width, int height)
+    {
+        if (!glfwInit())
+        {
+            throw std::exception(
+            "Unable to initialize GLFW!"
+            );
+            exit(1);
+        }
+
+        // Using 4.3 for debugger callbacks
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef _DEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+        // Enable MSAA (GLFW)
+        glfwWindowHint(GLFW_SAMPLES, AA_SAMPLES);
+
+        m_handle = glfwCreateWindow(
+            width,
+            height,
+            "OpenGL Pacman",
+            nullptr,
+            nullptr
+        );
+
+        if (m_handle == nullptr)
+        {
+            throw std::exception(
+                "Unable to create GLFW window!"
+            );
+            glfwTerminate();
+            exit(1);
+        }
+
+        glfwMakeContextCurrent(m_handle);
+        glfwSetWindowUserPointer(m_handle, this);
+
+        glfwSetFramebufferSizeCallback(
+            m_handle,
+            SizeChangeCallback
+        );
+        glfwSetKeyCallback(
+            m_handle,
+            KeyCallback
+        );
+
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            throw std::exception(
+                "Unable to initialize GLAD!"
+            );
+            exit(1);
+        }
+
+        // Enable debug callbacks
+#ifdef _DEBUG
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(MessageCallback, nullptr);
+#endif
+
+        glfwSwapInterval(1);
+
+        // Enable MSAA (glad)
+        glEnable(GL_MULTISAMPLE);
+    }
+
+    void WindowLoop()
+    {
+        m_game->Init();
+        auto prevTime = std::chrono::high_resolution_clock::now();
+
+        while (!glfwWindowShouldClose(m_handle) &&
+               !m_shouldClose)
+        {
+            // Calculate delta time
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<float> deltaTime = currentTime - prevTime;
+            prevTime = currentTime;
+
+            // Call engine loops
+            m_game->Update(deltaTime.count());
+            m_game->Render();
+
+            // Refresh window
+            glfwSwapBuffers(m_handle);
+            glfwPollEvents();
+        }
+
+        m_game->Destroy();
+    }
+
+protected:
+    std::unique_ptr<Game> m_game;
+
+private:
+    GLFWwindow* m_handle;
+    bool m_shouldClose = false;
+};

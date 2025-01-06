@@ -1,0 +1,98 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 8188a22e894c349371d8cec4533cc7ea97e329090ec15b2a8460d7a8076a2454
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 96201a1d3bacbd78ea49b787c5f6ec4f886225aeeb250da367438d8e32c427a4
+Status: install ok installed
+
+Package: egl-registry
+Version: 2024-01-25
+Architecture: x64-windows
+Multi-Arch: same
+Abi: f60bdadd4fb266c5df4e1af5255dd5aa8d9d50791b950d5ab6947b62c70c641f
+Description: EGL API and Extension Registry
+Status: install ok installed
+
+Package: opengl-registry
+Version: 2024-02-10
+Port-Version: 1
+Depends: egl-registry
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 1ab42e75af1912419cc5a55ec3be1c260e84b9a5fe071442416256e7ff254a34
+Description: OpenGL, OpenGL ES, and OpenGL ES-SC API and Extension Registry
+Status: install ok installed
+
+Package: glad
+Version: 0.1.36
+Depends: egl-registry, opengl-registry, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 282c3fee09b88d559bd7a64ed81f63e4f6b2798d405abfe9f4cc21e071a543f2
+Description: Multi-Language Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs.
+Default-Features: loader
+Status: install ok installed
+
+Package: glad
+Feature: loader
+Architecture: x64-windows
+Multi-Arch: same
+Description: Generate loader logic.
+Status: install ok installed
+
+Package: glfw3
+Version: 3.4
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: a1bee44c341d6385bf312e31a58825321c355cd73c90bcc72f9a24be88462a6f
+Description: GLFW is a free, Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
+Status: install ok installed
+
+Package: glm
+Version: 1.0.1
+Port-Version: 3
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 09ddb450449b174eb6cc3f10bd41ec80f95efa5411147b40414ce139d23d6344
+Description: OpenGL Mathematics (GLM)
+Status: install ok installed
+
+Package: stb
+Version: 2024-07-29
+Port-Version: 1
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 63f4aa9d7392da63c755b525894d5711db8172644528a69559bf529d3a3b2de4
+Description: public domain header-only libraries
+Status: install ok installed
+
+Package: fmt
+Version: 11.0.2
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 6783231ae2e69fc5c34f0e1b595a1d8ce0d10dd63e0fd682552483dcba134be3
+Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+Status: install ok installed
+
+Package: spdlog
+Version: 1.15.0
+Port-Version: 1
+Depends: fmt, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: f9cc1028fa3fcbe5ea1e578376667ef7e5cefc24b2544c10113787ab0185a30e
+Description: Very fast, header-only/compiled, C++ logging library.
+Status: install ok installed
+
