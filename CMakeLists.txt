@@ -18,6 +18,10 @@ add_executable(${PROJECT_NAME}
     src/IO/ResourceManager.h
         src/IO/Log.cpp
         src/IO/Log.h
+        src/Rendering/AnimatedSprite.cpp
+        src/Rendering/AnimatedSprite.h
+        src/Game/Entities/PlayableCharacter.cpp
+        src/Game/Entities/PlayableCharacter.h
 )
 
 include_directories(${PROJECT_NAME}

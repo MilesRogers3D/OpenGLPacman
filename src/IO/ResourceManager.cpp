@@ -1,7 +1,13 @@
 #include "ResourceManager.h"
+#include "Log.h"
 
 std::map<std::string, std::shared_ptr<Texture>> ResourceManager::Textures;
 std::map<std::string, std::shared_ptr<Shader>> ResourceManager::Shaders;
+
+ResourceManager::ResourceManager()
+{
+    Log::Info("[ResourceManager] Initialization complete!");
+}
 
 std::shared_ptr<Shader> ResourceManager::LoadShader(
     const char* vertPath,
@@ -18,6 +24,11 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(
 
     Shaders[name] = shader;
 
+    Log::Info(
+        "[ResourceManager] Shader created: [%s]",
+        name.c_str()
+    );
+
     return Shaders[name];
 }
 
@@ -32,6 +43,11 @@ std::shared_ptr<Texture> ResourceManager::LoadTexture(const char* path, const st
     texture->LoadTexture(path);
 
     Textures[name] = texture;
+
+    Log::Info(
+        "[ResourceManager] Texture created: [%s]",
+        name.c_str()
+    );
 
     return Textures[name];
 }
@@ -51,4 +67,6 @@ void ResourceManager::DestroyAll()
     {
         glDeleteTextures(1, &texture.second->ID);
     }
+
+    Log::Info("[ResourceManager] Shutdown - deallocated all bound resources");
 }

@@ -2,6 +2,7 @@
 
 #include "IO/ResourceManager.h"
 #include "IO/Log.h"
+#include "Entities/PlayableCharacter.h"
 #include <glad/glad.h>
 #include <iostream>
 
@@ -40,13 +41,25 @@ void Game::Init()
             );
         }
     }
+
+    // Pacman animated sprite setup
+    auto pacmanTex = ResourceManager::LoadTexture("res/sprites/pacman.png", "Pacman");
+
+    m_sprites["Pacman"] = std::make_shared<PlayableCharacter>(
+        3,
+        0.25F,
+        pacmanTex,
+        glm::vec2(500.0F, 500.0F),
+        glm::vec2(64.0F),
+        glm::vec3(1.0F)
+    );
 }
 
 void Game::Update(float deltaTime)
 {
     for (auto sprite : m_sprites)
     {
-        sprite.second->AddRotation(ROTATE_SPEED * deltaTime);
+        sprite.second->Update(deltaTime);
     }
 }
 
@@ -63,15 +76,34 @@ void Game::Render()
 
 void Game::Destroy()
 {
-
+    Log::Info("Shutting down...");
+    ResourceManager::DestroyAll();
 }
 
 void Game::OnKeyPressed(int key)
 {
-    std::cout << "Key pressed: " << key << "\n";
+    for (auto sprite : m_sprites)
+    {
+        if (PlayableCharacter* character =
+            dynamic_cast<PlayableCharacter*>(sprite.second.get()))
+        {
+            character->OnKeyPressed(key);
+        }
+    }
+
+    Log::Info("Key pressed: %i", key);
 }
 
 void Game::OnKeyReleased(int key)
 {
-    std::cout << "Key released: " << key << "\n";
+    for (auto sprite : m_sprites)
+    {
+        if (PlayableCharacter* character =
+            dynamic_cast<PlayableCharacter*>(sprite.second.get()))
+        {
+            character->OnKeyReleased(key);
+        }
+    }
+
+    Log::Info("Key released: %i", key);
 }

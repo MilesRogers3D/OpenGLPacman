@@ -29,5 +29,5 @@ public:
     static void DestroyAll();
 
 private:
-    ResourceManager() = default;
+    ResourceManager();
 };

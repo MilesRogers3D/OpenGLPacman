@@ -1,0 +1,24 @@
+#pragma once
+
+#include "Rendering/AnimatedSprite.h"
+
+class PlayableCharacter : public AnimatedSprite
+{
+public:
+    explicit PlayableCharacter(
+        int divisions,
+        float frameDuration,
+        std::shared_ptr<Texture>& texture,
+        glm::vec2 position = glm::vec2(0.0F),
+        glm::vec2 size = glm::vec2(10.0F, 10.0F),
+        glm::vec3 color = glm::vec3(1.0F)
+    );
+
+    void OnKeyPressed(int key);
+    void OnKeyReleased(int key);
+
+    void Update(float deltaTime) override;
+
+private:
+    glm::vec2 m_input = glm::vec2(0.0F);
+};

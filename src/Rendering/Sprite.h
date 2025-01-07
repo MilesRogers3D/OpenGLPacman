@@ -20,12 +20,16 @@ public:
 
     ~Sprite();
 
-    void Draw();
+    virtual void Draw();
+    virtual void Update(float deltaTime);
+
+    void SetPosition(glm::vec2 position);
+    void AddPosition(glm::vec2 position);
 
     void SetRotation(float rotation);
     void AddRotation(float rotation);
 
-private:
+protected:
     void InitRenderData();
 
     std::shared_ptr<Shader> m_shader;

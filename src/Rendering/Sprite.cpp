@@ -113,3 +113,18 @@ void Sprite::AddRotation(float rotation)
 {
     m_rotation += glm::radians(rotation);
 }
+
+void Sprite::Update(float deltaTime)
+{
+
+}
+
+void Sprite::SetPosition(glm::vec2 position)
+{
+    m_position = position;
+}
+
+void Sprite::AddPosition(glm::vec2 position)
+{
+    m_position += position;
+}
