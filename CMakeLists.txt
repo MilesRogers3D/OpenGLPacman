@@ -16,12 +16,14 @@ add_executable(${PROJECT_NAME}
     src/Rendering/Texture.h
     src/IO/ResourceManager.cpp
     src/IO/ResourceManager.h
-        src/IO/Log.cpp
-        src/IO/Log.h
-        src/Rendering/AnimatedSprite.cpp
-        src/Rendering/AnimatedSprite.h
-        src/Game/Entities/PlayableCharacter.cpp
-        src/Game/Entities/PlayableCharacter.h
+    src/IO/Log.cpp
+    src/IO/Log.h
+    src/Rendering/AnimatedSprite.cpp
+    src/Rendering/AnimatedSprite.h
+        src/Game/Entities/Pacman.cpp
+        src/Game/Entities/Pacman.h
+        src/Rendering/Camera.cpp
+        src/Rendering/Camera.h
 )
 
 include_directories(${PROJECT_NAME}

@@ -2,13 +2,23 @@
 
 #include "IO/ResourceManager.h"
 #include "IO/Log.h"
-#include "Entities/PlayableCharacter.h"
+#include "Entities/Pacman.h"
 #include <glad/glad.h>
 #include <iostream>
 
 std::map<std::string, std::shared_ptr<Sprite>> Game::m_sprites;
 
 #define ROTATE_SPEED 15.0F
+
+Game::Game()
+{
+    // Camera setup
+    m_camera = std::make_shared<Camera>(
+        glm::vec2(0.0F),
+        896,
+        1152
+    );
+}
 
 void Game::Init()
 {
@@ -45,7 +55,7 @@ void Game::Init()
     // Pacman animated sprite setup
     auto pacmanTex = ResourceManager::LoadTexture("res/sprites/pacman.png", "Pacman");
 
-    m_sprites["Pacman"] = std::make_shared<PlayableCharacter>(
+    m_sprites["Pacman"] = std::make_shared<Pacman>(
         3,
         0.25F,
         pacmanTex,
@@ -70,7 +80,7 @@ void Game::Render()
 
     for (auto sprite : m_sprites)
     {
-        sprite.second->Draw();
+        sprite.second->Draw(m_camera);
     }
 }
 
@@ -84,8 +94,7 @@ void Game::OnKeyPressed(int key)
 {
     for (auto sprite : m_sprites)
     {
-        if (PlayableCharacter* character =
-            dynamic_cast<PlayableCharacter*>(sprite.second.get()))
+        if (Pacman* character = dynamic_cast<Pacman*>(sprite.second.get()))
         {
             character->OnKeyPressed(key);
         }
@@ -98,8 +107,8 @@ void Game::OnKeyReleased(int key)
 {
     for (auto sprite : m_sprites)
     {
-        if (PlayableCharacter* character =
-            dynamic_cast<PlayableCharacter*>(sprite.second.get()))
+        if (Pacman* character =
+            dynamic_cast<Pacman*>(sprite.second.get()))
         {
             character->OnKeyReleased(key);
         }

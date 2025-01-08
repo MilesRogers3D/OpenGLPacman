@@ -2,10 +2,10 @@
 
 #include "Rendering/AnimatedSprite.h"
 
-class PlayableCharacter : public AnimatedSprite
+class Pacman : public AnimatedSprite
 {
 public:
-    explicit PlayableCharacter(
+    explicit Pacman(
         int divisions,
         float frameDuration,
         std::shared_ptr<Texture>& texture,

@@ -15,7 +15,7 @@ public:
         glm::vec3 color = glm::vec3(1.0F)
     );
 
-    void Draw() override;
+    void Draw(std::shared_ptr<Camera>& camera) override;
     void Update(float deltaTime) override;
 
 private:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rendering/Sprite.h"
+#include "Rendering/Camera.h"
 
 class Game
 {
@@ -16,9 +17,11 @@ protected:
     void OnKeyReleased(int key);
 
 public:
-    Game() = default;
+    Game();
     ~Game() = default;
 
 private:
+    std::shared_ptr<Camera> m_camera;
+
     static std::map<std::string, std::shared_ptr<Sprite>> m_sprites;
 };

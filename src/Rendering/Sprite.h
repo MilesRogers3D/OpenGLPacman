@@ -1,7 +1,8 @@
 #pragma once
 
-#include <memory>
 #include "IO/ResourceManager.h"
+#include "Rendering/Camera.h"
+#include <memory>
 
 class Sprite
 {
@@ -20,7 +21,7 @@ public:
 
     ~Sprite();
 
-    virtual void Draw();
+    virtual void Draw(std::shared_ptr<Camera>& camera);
     virtual void Update(float deltaTime);
 
     void SetPosition(glm::vec2 position);
@@ -41,15 +42,6 @@ protected:
     glm::vec2 m_pivot = glm::vec2(0.5F);
     glm::vec2 m_size;
     glm::vec3 m_color;
-
-    glm::mat4 m_projMatrix = glm::ortho(
-        0.0F,
-        800.0F,
-        600.0F,
-        0.0F,
-        -1.0F,
-        1.0F
-    );
 
     unsigned int m_quadVAO;
 };

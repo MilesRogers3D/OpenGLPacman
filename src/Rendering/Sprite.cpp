@@ -27,7 +27,7 @@ Sprite::~Sprite()
     glDeleteVertexArrays(1, &m_quadVAO);
 }
 
-void Sprite::Draw()
+void Sprite::Draw(std::shared_ptr<Camera>& camera)
 {
     m_shader->Use();
 
@@ -49,7 +49,7 @@ void Sprite::Draw()
     // Shader setup
     m_shader->SetMat4("model", modelMatrix);
     m_shader->SetVec3("spriteColor", m_color);
-    m_shader->SetMat4("projection", m_projMatrix);
+    m_shader->SetMat4("projection", camera->GetProjection());
 
     if (m_hasTexture)
     {

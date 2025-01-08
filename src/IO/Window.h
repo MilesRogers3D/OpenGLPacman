@@ -147,6 +147,7 @@ public:
 
     void WindowLoop()
     {
+        m_game = std::make_unique<Game>();
         m_game->Init();
         auto prevTime = std::chrono::high_resolution_clock::now();
 

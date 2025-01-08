@@ -24,7 +24,7 @@ AnimatedSprite::AnimatedSprite(
     m_startTime = GetCurrentTime();
 }
 
-void AnimatedSprite::Draw()
+void AnimatedSprite::Draw(std::shared_ptr<Camera>& camera)
 {
     m_shader->Use();
 
@@ -36,7 +36,7 @@ void AnimatedSprite::Draw()
     int frame = (int)(elapsedTime / m_frameDuration) % m_divisions;
     m_shader->SetInt("frame", frame);
 
-    Sprite::Draw();
+    Sprite::Draw(camera);
 
     m_shader->SetInt("divisions", 1);
     m_shader->SetInt("frame", 0);
