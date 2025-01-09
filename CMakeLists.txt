@@ -8,8 +8,8 @@ add_executable(${PROJECT_NAME}
     src/IO/Window.h
     src/Game/Game.cpp
     src/Game/Game.h
-    src/Rendering/Sprite.cpp
-    src/Rendering/Sprite.h
+    src/Rendering/Sprite/Sprite.cpp
+    src/Rendering/Sprite/Sprite.h
     src/Rendering/Shader.cpp
     src/Rendering/Shader.h
     src/Rendering/Texture.cpp
@@ -18,12 +18,14 @@ add_executable(${PROJECT_NAME}
     src/IO/ResourceManager.h
     src/IO/Log.cpp
     src/IO/Log.h
-    src/Rendering/AnimatedSprite.cpp
-    src/Rendering/AnimatedSprite.h
-        src/Game/Entities/Pacman.cpp
-        src/Game/Entities/Pacman.h
-        src/Rendering/Camera.cpp
-        src/Rendering/Camera.h
+    src/Rendering/Sprite/AnimatedSprite.cpp
+    src/Rendering/Sprite/AnimatedSprite.h
+    src/Game/Entities/Pacman.cpp
+    src/Game/Entities/Pacman.h
+    src/Rendering/Camera.cpp
+    src/Rendering/Camera.h
+    src/Rendering/Font/BitmapFont.cpp
+    src/Rendering/Font/BitmapFont.h
 )
 
 include_directories(${PROJECT_NAME}
@@ -47,6 +49,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Stb_INCLUDE_DIR})
 
 find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # Copy resources to build directory
 # ...

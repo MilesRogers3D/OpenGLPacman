@@ -15,11 +15,17 @@ class Window
 {
 private:
     static void SizeChangeCallback(
-        GLFWwindow *handle,
+        GLFWwindow* handle,
         int width,
         int height)
     {
         glViewport(0, 0, width, height);
+
+        auto windowPtr = static_cast<Window*>(
+            glfwGetWindowUserPointer(handle)
+        );
+
+        windowPtr->m_game->OnWindowResize(width, height);
     }
 
     static void KeyCallback(

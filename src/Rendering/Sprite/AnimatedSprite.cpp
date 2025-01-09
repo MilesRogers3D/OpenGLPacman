@@ -3,7 +3,7 @@
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::duration<float> FSec;
 
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 AnimatedSprite::AnimatedSprite(
     int divisions,

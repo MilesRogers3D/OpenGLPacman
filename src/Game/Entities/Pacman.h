@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rendering/AnimatedSprite.h"
+#include "Rendering/Sprite/AnimatedSprite.h"
 
 class Pacman : public AnimatedSprite
 {

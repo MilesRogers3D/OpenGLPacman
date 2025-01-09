@@ -3,6 +3,7 @@
 #include "IO/ResourceManager.h"
 #include "IO/Log.h"
 #include "Entities/Pacman.h"
+#include "Rendering/Font/BitmapFont.h"
 #include <glad/glad.h>
 #include <iostream>
 
@@ -26,6 +27,16 @@ void Game::Init()
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    auto fontTex = ResourceManager::LoadTexture(
+        "res/fonts/font.png",
+        "FontTexture"
+    );
+    m_font = std::make_shared<BitmapFont>();
+    m_font->LoadFont(
+        fontTex,
+        "res/fonts/font.json"
+    );
 
     // Ghost sprite setup
     auto ghostTex = ResourceManager::LoadTexture("res/sprites/ghost.png", "Blinky");
@@ -82,6 +93,14 @@ void Game::Render()
     {
         sprite.second->Draw(m_camera);
     }
+
+    m_font->RenderText(
+        "HELLO WORLD! - # 500 @$ / MILES ROGERS 2024",
+        glm::vec2(10.0F),
+        2.0F,
+        glm::vec3(1.0F),
+        m_camera
+    );
 }
 
 void Game::Destroy()
@@ -115,4 +134,9 @@ void Game::OnKeyReleased(int key)
     }
 
     Log::Info("Key released: %i", key);
+}
+
+void Game::OnWindowResize(int width, int height)
+{
+    m_camera->SetFrustumSize(width, height);
 }
