@@ -4,32 +4,35 @@ project(OpenGLPacman)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(${PROJECT_NAME}
-    src/main.cpp
-    src/IO/Window.h
-    src/Game/Game.cpp
-    src/Game/Game.h
-    src/Rendering/Sprite/Sprite.cpp
-    src/Rendering/Sprite/Sprite.h
-    src/Rendering/Shader.cpp
-    src/Rendering/Shader.h
-    src/Rendering/Texture.cpp
-    src/Rendering/Texture.h
-    src/IO/ResourceManager.cpp
-    src/IO/ResourceManager.h
-    src/IO/Log.cpp
-    src/IO/Log.h
-    src/Rendering/Sprite/AnimatedSprite.cpp
-    src/Rendering/Sprite/AnimatedSprite.h
-    src/Game/Entities/Pacman.cpp
-    src/Game/Entities/Pacman.h
-    src/Rendering/Camera.cpp
-    src/Rendering/Camera.h
-    src/Rendering/Font/BitmapFont.cpp
-    src/Rendering/Font/BitmapFont.h
+        src/main.cpp
+        src/IO/Window.cpp
+        src/IO/Window.h
+        src/Game/Game.cpp
+        src/Game/Game.h
+        src/Rendering/Sprite/Sprite.cpp
+        src/Rendering/Sprite/Sprite.h
+        src/Rendering/Shader.cpp
+        src/Rendering/Shader.h
+        src/Rendering/Texture.cpp
+        src/Rendering/Texture.h
+        src/IO/ResourceManager.cpp
+        src/IO/ResourceManager.h
+        src/IO/Log.cpp
+        src/IO/Log.h
+        src/Rendering/Sprite/AnimatedSprite.cpp
+        src/Rendering/Sprite/AnimatedSprite.h
+        src/Game/Entities/Pacman.cpp
+        src/Game/Entities/Pacman.h
+        src/Rendering/Camera.cpp
+        src/Rendering/Camera.h
+        src/Rendering/Font/BitmapFont.cpp
+        src/Rendering/Font/BitmapFont.h
+        src/IO/Audio/AudioEmitter.cpp
+        src/IO/Audio/AudioEmitter.h
 )
 
 include_directories(${PROJECT_NAME}
-    src/
+        src
 )
 
 # External libraries
@@ -52,6 +55,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
+find_path(MINIAUDIO_INCLUDE_DIRS "miniaudio.h")
+target_include_directories(${PROJECT_NAME} PRIVATE ${MINIAUDIO_INCLUDE_DIRS})
 
 # Copy resources to build directory
 # ...

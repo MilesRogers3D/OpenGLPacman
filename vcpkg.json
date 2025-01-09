@@ -20,5 +20,8 @@
   }, {
     "name" : "nlohmann-json",
     "version>=" : "3.11.3#1"
+  }, {
+    "name" : "miniaudio",
+    "version>=" : "0.11.21"
   } ]
 }

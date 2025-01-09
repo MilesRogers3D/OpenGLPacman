@@ -3,6 +3,7 @@
 #include "Rendering/Sprite/Sprite.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Font/BitmapFont.h"
+#include "IO/Audio/AudioEmitter.h"
 
 class Game
 {
@@ -20,12 +21,13 @@ protected:
     void OnWindowResize(int width, int height);
 
 public:
-    Game();
+    Game() = default;
     ~Game() = default;
 
 private:
     std::shared_ptr<Camera> m_camera;
     std::shared_ptr<BitmapFont> m_font;
+    std::shared_ptr<AudioEmitter> m_audioEmitter;
 
     static std::map<std::string, std::shared_ptr<Sprite>> m_sprites;
 };

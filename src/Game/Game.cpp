@@ -11,22 +11,22 @@ std::map<std::string, std::shared_ptr<Sprite>> Game::m_sprites;
 
 #define ROTATE_SPEED 15.0F
 
-Game::Game()
-{
-    // Camera setup
-    m_camera = std::make_shared<Camera>(
-        glm::vec2(0.0F),
-        896,
-        1152
-    );
-}
-
 void Game::Init()
 {
     Log::Trace("Hello game!");
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Camera setup
+    m_camera = std::make_shared<Camera>(
+        glm::vec2(0.0F),
+        896,
+        1152
+    );
+
+    // Audio emitter setup
+    m_audioEmitter = std::make_shared<AudioEmitter>();
 
     auto fontTex = ResourceManager::LoadTexture(
         "res/fonts/font.png",
@@ -74,6 +74,9 @@ void Game::Init()
         glm::vec2(64.0F),
         glm::vec3(1.0F)
     );
+
+    // Play intro sound
+    m_audioEmitter->Play("res/audio/music/intro.wav");
 }
 
 void Game::Update(float deltaTime)
@@ -118,6 +121,8 @@ void Game::OnKeyPressed(int key)
             character->OnKeyPressed(key);
         }
     }
+
+    m_audioEmitter->Play("res/audio/sfx/chomp.wav");
 
     Log::Info("Key pressed: %i", key);
 }
