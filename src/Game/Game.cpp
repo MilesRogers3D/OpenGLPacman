@@ -5,6 +5,7 @@
 #include "Entities/Pacman.h"
 #include "Rendering/Font/BitmapFont.h"
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 
 std::map<std::string, std::shared_ptr<Sprite>> Game::m_sprites;
@@ -57,11 +58,21 @@ void Game::Init()
             m_sprites[name] = std::make_shared<Sprite>(
                 ghostTex,
                 pos,
-                glm::vec2(64.0F),
+                glm::vec2(56.0F),
                 glm::vec3(1.0F)
             );
         }
     }
+
+    // Maze setup
+    auto mazeTex = ResourceManager::LoadTexture("res/sprites/maze.png", "Maze");
+
+    m_sprites["Maze"] = std::make_shared<Sprite>(
+        mazeTex,
+        glm::vec2(0.0F, 96.0F),
+        glm::vec2(896.0F, 992.0F),
+        glm::vec3(1.0F)
+    );
 
     // Pacman animated sprite setup
     auto pacmanTex = ResourceManager::LoadTexture("res/sprites/pacman.png", "Pacman");
@@ -71,7 +82,7 @@ void Game::Init()
         0.25F,
         pacmanTex,
         glm::vec2(500.0F, 500.0F),
-        glm::vec2(64.0F),
+        glm::vec2(52.0F),
         glm::vec3(1.0F)
     );
 
@@ -98,9 +109,9 @@ void Game::Render()
     }
 
     m_font->RenderText(
-        "HELLO WORLD! - # 500 @$ / MILES ROGERS 2024",
+        "HELLO PAC-MAN! - # 500 @$",
         glm::vec2(10.0F),
-        2.0F,
+        3.0F,
         glm::vec3(1.0F),
         m_camera
     );
@@ -114,6 +125,12 @@ void Game::Destroy()
 
 void Game::OnKeyPressed(int key)
 {
+    if (key == GLFW_KEY_ESCAPE)
+    {
+        // TODO: Add pausing
+        exit(1);
+    }
+
     for (auto sprite : m_sprites)
     {
         if (Pacman* character = dynamic_cast<Pacman*>(sprite.second.get()))
