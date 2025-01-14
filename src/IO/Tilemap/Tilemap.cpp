@@ -40,11 +40,6 @@ Tilemap::Tilemap(
     m_tileFootprint = (float)m_tileSize
         / (float)m_pixelsPerUnit * 100.0F;
 
-    for (const auto& tileSprite : tileSprites)
-    {
-        tileSprite->SetScale(glm::vec2(m_tileFootprint));
-    }
-
     // Get first GIDs from each tile set
     if (data["tilesets"].size() != tileSprites.size())
     {
@@ -156,7 +151,7 @@ void Tilemap::Draw(std::shared_ptr<Camera> &camera)
                 for (const Tileset& tileset : m_tileSets)
                 {
                     if (tileset.FirstGID <= tileID &&
-                        tileset.FirstGID + tileset.Length - 1 > tileID)
+                        tileset.FirstGID + tileset.Length + 1 >= tileID)
                     {
                         tileIndex = tileID - tileset.FirstGID;
                         break;
@@ -173,17 +168,19 @@ void Tilemap::Draw(std::shared_ptr<Camera> &camera)
                     m_tileFootprint * (float)j
                 ));
 
-                if (layer.Tiles[index].FlipDiagonal)
-                {
-                    tileSprite->SetRotation(90.0F);
-                }
-
-                auto flipFactor = glm::vec2(
-                    layer.Tiles[index].FlipHorizontal ? -1.0F : 1.0F,
-                    layer.Tiles[index].FlipVertical   ? -1.0F : 1.0F
+                // Set flipping
+                tileSprite->SetFlipHorizontal(
+                    layer.Tiles[index].FlipHorizontal
+                );
+                tileSprite->SetFlipVertical(
+                    layer.Tiles[index].FlipVertical
+                );
+                tileSprite->SetFlipDiagonal(
+                    layer.Tiles[index].FlipDiagonal
                 );
 
-                tileSprite->SetScale(glm::vec2(m_tileFootprint) * flipFactor);
+                // Set size
+                tileSprite->SetScale(glm::vec2(m_tileFootprint));
 
                 // Draw!
                 tileSprite->SetCurrentTileIndex(

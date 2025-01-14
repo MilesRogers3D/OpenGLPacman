@@ -32,6 +32,10 @@ public:
 
     void SetScale(glm::vec2 scale);
 
+    void SetFlipHorizontal(bool flip);
+    void SetFlipVertical(bool flip);
+    void SetFlipDiagonal(bool flip);
+
     void ResetTransform();
 
 protected:
@@ -46,6 +50,10 @@ protected:
     glm::vec2 m_pivot = glm::vec2(0.5F);
     glm::vec2 m_size;
     glm::vec3 m_color;
+
+    bool m_flipHorizontal = false;
+    bool m_flipVertical = false;
+    bool m_flipDiagonal = false;
 
     unsigned int m_quadVAO;
 };

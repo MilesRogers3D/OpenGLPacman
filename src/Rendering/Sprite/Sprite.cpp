@@ -44,11 +44,37 @@ void Sprite::Draw(std::shared_ptr<Camera>& camera)
     // Rotation
     modelMatrix = glm::rotate(modelMatrix, m_rotation, glm::vec3(0.0F, 0.0F, 1.0F));
 
-    // Sizing
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(m_size, 1.0F));
+    // Flipping
+    if (m_flipHorizontal)
+    {
+        modelMatrix = glm::rotate(
+            modelMatrix,
+            glm::radians(180.0F),
+            glm::vec3(0.0F, 1.0F, 0.0F)
+        );
+    }
+    if (m_flipVertical)
+    {
+        modelMatrix = glm::rotate(
+            modelMatrix,
+            glm::radians(180.0F),
+            glm::vec3(1.0F, 0.0F, 0.0F)
+        );
+    }
+    if (m_flipDiagonal)
+    {
+        modelMatrix = glm::rotate(
+            modelMatrix,
+            glm::radians(180.0F),
+            glm::vec3(0.71F, 0.71F, 0.0F)
+        );
+    }
 
     // Set pivot point
     modelMatrix = glm::translate(modelMatrix, glm::vec3(-offset, 0.0F));
+
+    // Sizing
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(m_size, 1.0F));
 
     // Shader setup
     m_shader->SetMat4("model", modelMatrix);
@@ -138,9 +164,28 @@ void Sprite::SetScale(glm::vec2 scale)
     m_size = scale;
 }
 
+void Sprite::SetFlipHorizontal(bool flip)
+{
+    m_flipHorizontal = flip;
+}
+
+void Sprite::SetFlipVertical(bool flip)
+{
+    m_flipVertical = flip;
+}
+
+void Sprite::SetFlipDiagonal(bool flip)
+{
+    m_flipDiagonal = flip;
+}
+
 void Sprite::ResetTransform()
 {
     m_position = glm::vec2(0.0F);
     m_rotation = 0.0F;
     m_size = glm::vec2(1.0F);
+
+    m_flipHorizontal = false;
+    m_flipVertical = false;
+    m_flipDiagonal = false;
 }

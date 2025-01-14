@@ -71,7 +71,7 @@ void Game::Init()
     tileSprites.clear();
 
     auto mazeTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
-    auto dotTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
+    auto dotTex = ResourceManager::LoadTexture("res/sprites/dots.png", "MazeTileset");
     auto debugTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
 
     tileSprites.emplace_back(std::make_shared<TileSprite>(
@@ -90,7 +90,7 @@ void Game::Init()
     m_tileMap = std::make_shared<Tilemap>(
         "res/maps/level.json",
         tileSprites,
-        32
+        25
     );
 
     // Pacman animated sprite setup
@@ -100,7 +100,7 @@ void Game::Init()
         3,
         0.25F,
         pacmanTex,
-        glm::vec2(500.0F, 500.0F),
+        glm::vec2(425.0F, 630.0F),
         glm::vec2(52.0F),
         glm::vec3(1.0F)
     );
