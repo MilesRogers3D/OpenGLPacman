@@ -1,0 +1,3 @@
+[submodule "vendor/TSXParser"]
+	path = vendor/TSXParser
+	url = https://github.com/solar-storm-studios/TSXParser.git

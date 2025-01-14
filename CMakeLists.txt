@@ -29,10 +29,16 @@ add_executable(${PROJECT_NAME}
         src/Rendering/Font/BitmapFont.h
         src/IO/Audio/AudioEmitter.cpp
         src/IO/Audio/AudioEmitter.h
+        src/Game/Entities/Node.h
+        src/IO/Tilemap/Tilemap.cpp
+        src/IO/Tilemap/Tilemap.h
+        src/Rendering/Sprite/TileSprite.cpp
+        src/Rendering/Sprite/TileSprite.h
 )
 
 include_directories(${PROJECT_NAME}
-        src
+    src
+    vendor/TSXParser/include
 )
 
 # External libraries

@@ -10,6 +10,8 @@
 
 std::map<std::string, std::shared_ptr<Sprite>> Game::m_sprites;
 
+constexpr bool muteGame = true;
+
 #define ROTATE_SPEED 15.0F
 
 void Game::Init()
@@ -65,13 +67,30 @@ void Game::Init()
     }
 
     // Maze setup
-    auto mazeTex = ResourceManager::LoadTexture("res/sprites/maze.png", "Maze");
+    std::vector<std::shared_ptr<TileSprite>> tileSprites;
+    tileSprites.clear();
 
-    m_sprites["Maze"] = std::make_shared<Sprite>(
-        mazeTex,
-        glm::vec2(0.0F, 96.0F),
-        glm::vec2(896.0F, 992.0F),
-        glm::vec3(1.0F)
+    auto mazeTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
+    auto dotTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
+    auto debugTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
+
+    tileSprites.emplace_back(std::make_shared<TileSprite>(
+        glm::ivec2(6, 2),
+        mazeTex
+    ));
+    tileSprites.emplace_back(std::make_shared<TileSprite>(
+        glm::ivec2(2, 1),
+        dotTex
+    ));
+    tileSprites.emplace_back(std::make_shared<TileSprite>(
+        glm::ivec2(1, 1),
+        debugTex
+    ));
+
+    m_tileMap = std::make_shared<Tilemap>(
+        "res/maps/level.json",
+        tileSprites,
+        32
     );
 
     // Pacman animated sprite setup
@@ -87,7 +106,10 @@ void Game::Init()
     );
 
     // Play intro sound
-    m_audioEmitter->Play("res/audio/music/intro.wav");
+    if (!muteGame)
+    {
+        m_audioEmitter->Play("res/audio/music/intro.wav");
+    }
 }
 
 void Game::Update(float deltaTime)
@@ -102,6 +124,8 @@ void Game::Render()
 {
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_tileMap->Draw(m_camera);
 
     for (auto sprite : m_sprites)
     {

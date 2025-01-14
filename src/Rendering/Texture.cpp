@@ -9,8 +9,8 @@ Texture::Texture()
     Height = 0;
     InternalFormat = GL_RGB;
     ImageFormat = GL_RGB;
-    WrapS = GL_CLAMP;
-    WrapT = GL_CLAMP;
+    WrapS = GL_REPEAT;
+    WrapT = GL_REPEAT;
     FilterMin = GL_NEAREST;
     FilterMag = GL_NEAREST;
 

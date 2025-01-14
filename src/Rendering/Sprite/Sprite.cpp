@@ -31,20 +31,24 @@ void Sprite::Draw(std::shared_ptr<Camera>& camera)
 {
     m_shader->Use();
 
+    // (Matrix transformations are applied in reverse order)
     auto modelMatrix = glm::mat4(1.0F);
+    glm::vec2 offset = m_pivot * m_size;
 
     // Translation
     modelMatrix = glm::translate(modelMatrix, glm::vec3(m_position, 0.0F));
 
-    // Rotation (with respect to pivot point)
-    glm::vec2 offset = m_pivot * m_size;
-
+    // Reset pivot
     modelMatrix = glm::translate(modelMatrix, glm::vec3(offset, 0.0F));
+
+    // Rotation
     modelMatrix = glm::rotate(modelMatrix, m_rotation, glm::vec3(0.0F, 0.0F, 1.0F));
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(-offset, 0.0F));
 
     // Sizing
     modelMatrix = glm::scale(modelMatrix, glm::vec3(m_size, 1.0F));
+
+    // Set pivot point
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(-offset, 0.0F));
 
     // Shader setup
     m_shader->SetMat4("model", modelMatrix);
@@ -127,4 +131,16 @@ void Sprite::SetPosition(glm::vec2 position)
 void Sprite::AddPosition(glm::vec2 position)
 {
     m_position += position;
+}
+
+void Sprite::SetScale(glm::vec2 scale)
+{
+    m_size = scale;
+}
+
+void Sprite::ResetTransform()
+{
+    m_position = glm::vec2(0.0F);
+    m_rotation = 0.0F;
+    m_size = glm::vec2(1.0F);
 }

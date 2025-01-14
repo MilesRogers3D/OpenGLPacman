@@ -30,6 +30,10 @@ public:
     void SetRotation(float rotation);
     void AddRotation(float rotation);
 
+    void SetScale(glm::vec2 scale);
+
+    void ResetTransform();
+
 protected:
     void InitRenderData();
 

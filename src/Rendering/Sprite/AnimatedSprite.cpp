@@ -12,7 +12,7 @@ AnimatedSprite::AnimatedSprite(
     glm::vec2 position,
     glm::vec2 size,
     glm::vec3 color)
-        : Sprite (
+        : Sprite(
             texture,
             position,
             size,
@@ -28,7 +28,7 @@ void AnimatedSprite::Draw(std::shared_ptr<Camera>& camera)
 {
     m_shader->Use();
 
-    m_shader->SetInt("divisions", m_divisions);
+    m_shader->SetInt("xDivisions", m_divisions);
 
     // Get elapsed time in seconds
     double elapsedTime = glfwGetTime();
@@ -38,7 +38,7 @@ void AnimatedSprite::Draw(std::shared_ptr<Camera>& camera)
 
     Sprite::Draw(camera);
 
-    m_shader->SetInt("divisions", 1);
+    m_shader->SetInt("xDivisions", 1);
     m_shader->SetInt("frame", 0);
 }
 
