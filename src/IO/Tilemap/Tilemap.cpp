@@ -57,12 +57,12 @@ Tilemap::Tilemap(
          it++)
     {
         Tileset tileset = {};
+
         tileset.FirstGID = it.value()["firstgid"];
         tileset.TileSprite = tileSprites[tilesetIndex];
         tileset.Length = tileSprites[tilesetIndex]->GetTileAmount();
 
         m_tileSets.emplace_back(tileset);
-
         tilesetIndex++;
     }
 
@@ -160,7 +160,7 @@ void Tilemap::Draw(std::shared_ptr<Camera> &camera)
                     tilesetIndex += 1;
                 }
 
-                const auto& tileSprite = m_tileSets[0].TileSprite;
+                const auto& tileSprite = m_tileSets[tilesetIndex].TileSprite;
 
                 // Position
                 tileSprite->SetPosition(glm::vec2(
