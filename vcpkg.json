@@ -23,5 +23,16 @@
   }, {
     "name" : "miniaudio",
     "version>=" : "0.11.21"
+  }, {
+    "name" : "entt",
+    "version>=" : "3.14.0"
+  }, {
+    "name" : "imgui",
+    "version>=" : "1.91.6",
+    "features": [
+      "glfw-binding",
+      "opengl3-binding",
+      "docking-experimental"
+    ]
   } ]
 }

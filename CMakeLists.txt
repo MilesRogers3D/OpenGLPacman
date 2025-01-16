@@ -34,6 +34,11 @@ add_executable(${PROJECT_NAME}
         src/IO/Tilemap/Tilemap.h
         src/Rendering/Sprite/TileSprite.cpp
         src/Rendering/Sprite/TileSprite.h
+        src/Core/Scene/Scene.h
+        src/Core/Scene/Scene.cpp
+        src/Core/Scene/Entity.cpp
+        src/Core/Scene/Entity.h
+        src/Core/Scene/Components.h
 )
 
 include_directories(${PROJECT_NAME}
@@ -59,11 +64,17 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Stb_INCLUDE_DIR})
 find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 
+find_package(EnTT CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE EnTT::EnTT)
+
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 find_path(MINIAUDIO_INCLUDE_DIRS "miniaudio.h")
 target_include_directories(${PROJECT_NAME} PRIVATE ${MINIAUDIO_INCLUDE_DIRS})
+
+find_package(imgui CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui)
 
 # Copy resources to build directory
 # ...

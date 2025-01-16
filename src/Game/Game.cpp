@@ -1,9 +1,12 @@
 #include "Game.h"
 
+#include "IO/Window.h"
 #include "IO/ResourceManager.h"
 #include "IO/Log.h"
 #include "Entities/Pacman.h"
 #include "Rendering/Font/BitmapFont.h"
+
+#include <imgui.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -13,6 +16,12 @@ std::map<std::string, std::shared_ptr<Sprite>> Game::m_sprites;
 constexpr bool muteGame = true;
 
 #define ROTATE_SPEED 15.0F
+
+Game::Game(Window* window)
+{
+    std::shared_ptr<Window> windowPtr(window);
+    m_window = windowPtr;
+}
 
 void Game::Init()
 {
@@ -98,7 +107,7 @@ void Game::Init()
 
     m_sprites["Pacman"] = std::make_shared<Pacman>(
         3,
-        0.25F,
+        0.1F,
         pacmanTex,
         glm::vec2(425.0F, 630.0F),
         glm::vec2(52.0F),
@@ -120,8 +129,21 @@ void Game::Update(float deltaTime)
     }
 }
 
+void Game::RenderGUI()
+{
+    // Inspector window
+    if (ImGui::Begin("Debug Console"))
+    {
+        ImGui::SeparatorText("Debug Flags:");
+        ImGui::Checkbox("Show Collision", &m_showCollision);
+    }
+
+    ImGui::End();
+}
+
 void Game::Render()
 {
+    // Game rendering
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -139,11 +161,21 @@ void Game::Render()
         glm::vec3(1.0F),
         m_camera
     );
+
+    m_font->RenderText(
+        m_showCollision ? "COLLISION VIEW ENABLED" : "COLLISION VIEW DISABLED",
+        glm::vec2(10.0F, 45.0F),
+        1.0F,
+        glm::vec3(1.0F),
+        m_camera
+    );
 }
 
 void Game::Destroy()
 {
     Log::Info("Shutting down...");
+
+    // Game shutdown
     ResourceManager::DestroyAll();
 }
 
@@ -157,7 +189,8 @@ void Game::OnKeyPressed(int key)
 
     for (auto sprite : m_sprites)
     {
-        if (Pacman* character = dynamic_cast<Pacman*>(sprite.second.get()))
+        if (Pacman* character = dynamic_cast<Pacman*>(
+            sprite.second.get()))
         {
             character->OnKeyPressed(key);
         }

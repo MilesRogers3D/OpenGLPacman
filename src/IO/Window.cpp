@@ -2,6 +2,10 @@
 
 #include "IO/Log.h"
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 void Window::SizeChangeCallback(
     GLFWwindow* handle,
     int width,
@@ -139,13 +143,35 @@ void Window::InitWindow(int width, int height)
 
 void Window::WindowLoop()
 {
-    m_game = std::make_unique<Game>();
+    // Init ImGui
+    IMGUI_CHECKVERSION();
+
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    ImGui_ImplGlfw_InitForOpenGL(m_handle, true);
+    ImGui_ImplOpenGL3_Init();
+
+    // Get game pointer
+    m_game = std::make_unique<Game>(this);
     m_game->Init();
+
     auto prevTime = std::chrono::high_resolution_clock::now();
 
     while (!glfwWindowShouldClose(m_handle) &&
            !m_shouldClose)
     {
+        glfwPollEvents();
+
+        // Start ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         // Calculate delta time
         auto currentTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> deltaTime = currentTime - prevTime;
@@ -153,14 +179,28 @@ void Window::WindowLoop()
 
         // Call engine loops
         m_game->Update(deltaTime.count());
+        m_game->RenderGUI();
         m_game->Render();
+
+        // Render ImGui frame
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Refresh window
         glfwSwapBuffers(m_handle);
-        glfwPollEvents();
     }
 
     m_game->Destroy();
+
+    // Destroy ImGui context
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+GLFWwindow* Window::GetWindowHandle()
+{
+    return m_handle;
 }
 
 

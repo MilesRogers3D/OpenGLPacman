@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <memory>
 #include <exception>
 #include <chrono>
@@ -41,6 +42,8 @@ public:
         const GLchar* message,
         const void* userParam
     );
+
+    GLFWwindow* GetWindowHandle();
 
 protected:
     std::unique_ptr<Game> m_game;
