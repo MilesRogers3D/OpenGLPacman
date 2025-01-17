@@ -1,5 +1,5 @@
 #include "ResourceManager.h"
-#include "Log.h"
+#include "Core/Log.h"
 
 std::map<std::string, std::shared_ptr<Texture>> ResourceManager::Textures;
 std::map<std::string, std::shared_ptr<Shader>> ResourceManager::Shaders;
@@ -34,7 +34,19 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(
 
 std::shared_ptr<Shader> ResourceManager::GetShader(const std::string& name)
 {
+    // Must explicitly return null, maps insert data at
+    // lookup key location if it does not exist!
+    if (!Shaders.contains(name))
+    {
+        return nullptr;
+    }
+
     return Shaders[name];
+}
+
+bool ResourceManager::HasShader(const std::string &name)
+{
+    return Shaders.contains(name);
 }
 
 std::shared_ptr<Texture> ResourceManager::LoadTexture(const char* path, const std::string& name)
@@ -54,6 +66,13 @@ std::shared_ptr<Texture> ResourceManager::LoadTexture(const char* path, const st
 
 std::shared_ptr<Texture> ResourceManager::GetTexture(const std::string& name)
 {
+    // Must explicitly return null, maps insert data at
+    // lookup key location if it does not exist!
+    if (!Textures.contains(name))
+    {
+        return nullptr;
+    }
+
     return Textures[name];
 }
 

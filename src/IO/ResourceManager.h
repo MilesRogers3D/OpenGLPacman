@@ -19,6 +19,7 @@ public:
         const std::string& name
     );
     static std::shared_ptr<Shader> GetShader(const std::string& name);
+    static bool HasShader(const std::string& name);
 
     static std::shared_ptr<Texture> LoadTexture(
         const char* path,

@@ -1,5 +1,5 @@
 #include "TileSprite.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 TileSprite::TileSprite(
     glm::ivec2 divisions,

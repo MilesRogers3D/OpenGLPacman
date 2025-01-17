@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scene.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 #include <entt/entt.hpp>
 

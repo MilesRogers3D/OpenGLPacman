@@ -50,12 +50,10 @@ struct TransformComponent
     }
 };
 
-typedef glm::vec4 Color;
-
 struct SpriteRendererComponent
 {
     int TextureID = 0;
-    Color ColorTint = { 1.0F, 1.0F, 1.0F, 1.0F };
+    glm::vec4 ColorTint = { 1.0F, 1.0F, 1.0F, 1.0F };
 
     bool FlipHorizontal = false;
     bool FlipVertical = false;
@@ -63,15 +61,31 @@ struct SpriteRendererComponent
 
     explicit SpriteRendererComponent(
         const std::shared_ptr<Texture>& texture,
-        Color color)
+        glm::vec4 color)
     {
         TextureID = (int)texture->ID;
         ColorTint = color;
     }
 
     explicit SpriteRendererComponent(
-        Color color)
+        glm::vec4 color)
     {
         ColorTint = color;
     }
 };
+
+struct BoxColliderComponent
+{
+    // Position relative to transform pivot point
+    glm::vec2 Position;
+
+    // Size relative to transform size
+    glm::vec2 Size;
+
+    explicit BoxColliderComponent(
+        glm::vec2 position,
+        glm::vec2 size)
+            : Position(position),
+              Size(size) {};
+};
+

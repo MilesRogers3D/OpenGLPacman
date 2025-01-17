@@ -24,6 +24,8 @@ public:
     virtual void Draw(std::shared_ptr<Camera>& camera);
     virtual void Update(float deltaTime);
 
+    void DrawCollision(std::shared_ptr<Camera>& camera);
+
     void SetPosition(glm::vec2 position);
     void AddPosition(glm::vec2 position);
 
@@ -56,4 +58,28 @@ protected:
     bool m_flipDiagonal = false;
 
     unsigned int m_quadVAO;
+
+private:
+    struct BoxCollider
+    {
+        glm::vec2 Origin = { 0.0F, 0.0F };
+        glm::vec2 Size = { 1.0F, 1.0F };
+    };
+
+    struct ColliderData
+    {
+        glm::vec2 WorldOrigin;
+        glm::vec2 WorldSize;
+    };
+
+    BoxCollider m_boxCollider;
+
+    bool m_hasCollision = false;
+    bool m_drawCollision = false;
+
+public:
+    void SetCollisionEnabled(bool enable);
+    void SetDrawCollision(bool enable);
+
+    ColliderData GetColliderData();
 };

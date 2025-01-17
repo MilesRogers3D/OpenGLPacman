@@ -37,5 +37,5 @@ private:
     static std::map<std::string, std::shared_ptr<Sprite>> m_sprites;
 
 private: // Settings
-    bool m_showCollision = false;
+    bool m_showCollision = true;
 };

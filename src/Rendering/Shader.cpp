@@ -1,5 +1,5 @@
 #include "Shader.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 #include <fstream>
 #include <sstream>
@@ -48,20 +48,20 @@ void Shader::Load(const char* vertPath, const char* fragPath)
     vert = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert, 1, &vertSource, nullptr);
     glCompileShader(vert);
-    CheckCompilerErrors(vert, ShaderType::Vertex);
+    CheckCompilerErrors(vert, EShaderType::Vertex);
 
     // Fragment shader
     frag = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag, 1, &fragSource, nullptr);
     glCompileShader(frag);
-    CheckCompilerErrors(frag, ShaderType::Fragment);
+    CheckCompilerErrors(frag, EShaderType::Fragment);
 
     // Program
     ID = glCreateProgram();
     glAttachShader(ID, vert);
     glAttachShader(ID, frag);
     glLinkProgram(ID);
-    CheckCompilerErrors(ID, ShaderType::Program);
+    CheckCompilerErrors(ID, EShaderType::Program);
 
     // Cleanup
     glDeleteShader(vert);
@@ -149,12 +149,12 @@ std::string Shader::ReadTextFile(const char* path)
 
 void Shader::CheckCompilerErrors(
     unsigned int object,
-    Shader::ShaderType type)
+    Shader::EShaderType type)
 {
     int success;
     char infoLog[1024];
 
-    if (type != ShaderType::Program)
+    if (type != EShaderType::Program)
     {
         glGetShaderiv(object, GL_COMPILE_STATUS, &success);
 
@@ -163,7 +163,7 @@ void Shader::CheckCompilerErrors(
             glGetShaderInfoLog(object, 1024, nullptr, infoLog);
             Log::Critical(
                 "ERROR: Failed to compile %s shader. Error:\n%s \n",
-                (type == ShaderType::Vertex) ? "Vertex" : "Fragment",
+                (type == EShaderType::Vertex) ? "Vertex" : "Fragment",
                 infoLog
             );
         }

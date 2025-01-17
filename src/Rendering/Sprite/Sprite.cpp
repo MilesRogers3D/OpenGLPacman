@@ -1,5 +1,7 @@
 #include "Sprite.h"
 
+#include "Rendering/Debug/DebugShapes.h"
+
 Sprite::Sprite(std::shared_ptr<Texture>& texture, glm::vec2 position, glm::vec2 size, glm::vec3 color)
     : Sprite(position, size, color)
 {
@@ -94,16 +96,52 @@ void Sprite::Draw(std::shared_ptr<Camera>& camera)
     glBindVertexArray(0);
 }
 
+void Sprite::DrawCollision(std::shared_ptr<Camera>& camera)
+{
+    if (!m_drawCollision)
+    {
+        return;
+    }
+
+    ColliderData colData = GetColliderData();
+
+    std::vector<glm::vec2> boxPoints;
+    boxPoints.reserve(4);
+
+    boxPoints.emplace_back(
+        colData.WorldOrigin.x - colData.WorldSize.x * 0.5F,
+        colData.WorldOrigin.y - colData.WorldSize.y * 0.5F
+    );
+    boxPoints.emplace_back(
+        colData.WorldOrigin.x - colData.WorldSize.x * 0.5F,
+        colData.WorldOrigin.y + colData.WorldSize.y * 0.5F
+    );
+    boxPoints.emplace_back(
+        colData.WorldOrigin.x + colData.WorldSize.x * 0.5F,
+        colData.WorldOrigin.y + colData.WorldSize.y * 0.5F
+    );
+    boxPoints.emplace_back(
+        colData.WorldOrigin.x + colData.WorldSize.x * 0.5F,
+        colData.WorldOrigin.y - colData.WorldSize.y * 0.5F
+    );
+    boxPoints.emplace_back(
+        colData.WorldOrigin.x - colData.WorldSize.x * 0.5F,
+        colData.WorldOrigin.y - colData.WorldSize.y * 0.5F
+    );
+
+    DebugShapes::DrawLine(boxPoints, camera);
+}
+
 void Sprite::InitRenderData()
 {
     unsigned int VBO;
-    float vertices[] = 
+    float vertices[] =
     {
         // Pos      // UV
         0.0F, 1.0F, 0.0F, 1.0F,
         1.0F, 0.0F, 1.0F, 0.0F,
         0.0F, 0.0F, 0.0F, 0.0F,
-    
+
         0.0F, 1.0F, 0.0F, 1.0F,
         1.0F, 1.0F, 1.0F, 1.0F,
         1.0F, 0.0F, 1.0F, 0.0F
@@ -188,4 +226,27 @@ void Sprite::ResetTransform()
     m_flipHorizontal = false;
     m_flipVertical = false;
     m_flipDiagonal = false;
+}
+
+void Sprite::SetCollisionEnabled(bool enable)
+{
+    m_hasCollision = true;
+}
+
+void Sprite::SetDrawCollision(bool enable)
+{
+#ifdef _DEBUG
+    m_drawCollision = true;
+#endif
+}
+
+Sprite::ColliderData Sprite::GetColliderData()
+{
+    ColliderData data = {};
+
+    data.WorldOrigin = m_position + m_size * m_pivot
+        + m_boxCollider.Origin;
+    data.WorldSize = m_size * m_boxCollider.Size;
+
+    return data;
 }

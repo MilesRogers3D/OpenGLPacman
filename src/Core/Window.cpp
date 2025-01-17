@@ -1,10 +1,12 @@
 #include "Window.h"
 
-#include "IO/Log.h"
+#include "Log.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+#include <stb_image.h>
 
 void Window::SizeChangeCallback(
     GLFWwindow* handle,
@@ -95,7 +97,7 @@ void Window::InitWindow(int width, int height)
     m_handle = glfwCreateWindow(
         width,
         height,
-        "OpenGL Pacman",
+        "OpenGL Pac-Man",
         nullptr,
         nullptr
     );
@@ -139,6 +141,24 @@ void Window::InitWindow(int width, int height)
 
     // Enable MSAA (glad)
     glEnable(GL_MULTISAMPLE);
+
+    SetWindowIcon();
+}
+
+void Window::SetWindowIcon()
+{
+    GLFWimage images[1];
+    images[0].pixels = stbi_load(
+        "res/icon.png",
+        &images[0].width,
+        &images[0].height,
+        nullptr,
+        4
+    );
+
+    glfwSetWindowIcon(m_handle, 1, images);
+
+    stbi_image_free(images[0].pixels);
 }
 
 void Window::WindowLoop()
@@ -149,8 +169,7 @@ void Window::WindowLoop()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
 
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui_ImplGlfw_InitForOpenGL(m_handle, true);
@@ -186,7 +205,12 @@ void Window::WindowLoop()
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+        // Support viewports
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+
         // Refresh window
+        glfwMakeContextCurrent(m_handle);
         glfwSwapBuffers(m_handle);
     }
 

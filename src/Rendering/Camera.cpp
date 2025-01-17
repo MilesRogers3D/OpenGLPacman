@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 Camera::Camera(const glm::vec2& position, int width, int height)
     : m_position(position), m_width(width), m_height(height)

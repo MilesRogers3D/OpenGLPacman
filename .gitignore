@@ -13,3 +13,4 @@ _deps
 /cmake-build-debug-visual-studio/
 /.vs
 /cmake-build-debug
+/cmake-build-shipping

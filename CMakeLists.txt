@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/IO/Window.cpp
-        src/IO/Window.h
+        src/Core/Window.cpp
+        src/Core/Window.h
         src/Game/Game.cpp
         src/Game/Game.h
         src/Rendering/Sprite/Sprite.cpp
@@ -17,8 +17,8 @@ add_executable(${PROJECT_NAME}
         src/Rendering/Texture.h
         src/IO/ResourceManager.cpp
         src/IO/ResourceManager.h
-        src/IO/Log.cpp
-        src/IO/Log.h
+        src/Core/Log.cpp
+        src/Core/Log.h
         src/Rendering/Sprite/AnimatedSprite.cpp
         src/Rendering/Sprite/AnimatedSprite.h
         src/Game/Entities/Pacman.cpp
@@ -39,6 +39,8 @@ add_executable(${PROJECT_NAME}
         src/Core/Scene/Entity.cpp
         src/Core/Scene/Entity.h
         src/Core/Scene/Components.h
+        src/Rendering/Debug/DebugShapes.cpp
+        src/Rendering/Debug/DebugShapes.h
 )
 
 include_directories(${PROJECT_NAME}

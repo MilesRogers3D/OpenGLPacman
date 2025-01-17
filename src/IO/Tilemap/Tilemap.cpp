@@ -1,6 +1,6 @@
 #include "Tilemap.h"
 
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 #include <fstream>
 #include <nlohmann/json.hpp>

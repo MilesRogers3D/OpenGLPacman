@@ -1,10 +1,11 @@
 #include "Game.h"
 
-#include "IO/Window.h"
+#include "Core/Window.h"
 #include "IO/ResourceManager.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 #include "Entities/Pacman.h"
 #include "Rendering/Font/BitmapFont.h"
+#include "Rendering/Debug/DebugShapes.h"
 
 #include <imgui.h>
 #include <glad/glad.h>
@@ -72,6 +73,8 @@ void Game::Init()
                 glm::vec2(56.0F),
                 glm::vec3(1.0F)
             );
+            m_sprites[name]->SetCollisionEnabled(true);
+            m_sprites[name]->SetDrawCollision(true);
         }
     }
 
@@ -113,6 +116,8 @@ void Game::Init()
         glm::vec2(52.0F),
         glm::vec3(1.0F)
     );
+    m_sprites["Pacman"]->SetCollisionEnabled(true);
+    m_sprites["Pacman"]->SetDrawCollision(true);
 
     // Play intro sound
     if (!muteGame)
@@ -129,18 +134,6 @@ void Game::Update(float deltaTime)
     }
 }
 
-void Game::RenderGUI()
-{
-    // Inspector window
-    if (ImGui::Begin("Debug Console"))
-    {
-        ImGui::SeparatorText("Debug Flags:");
-        ImGui::Checkbox("Show Collision", &m_showCollision);
-    }
-
-    ImGui::End();
-}
-
 void Game::Render()
 {
     // Game rendering
@@ -152,6 +145,11 @@ void Game::Render()
     for (auto sprite : m_sprites)
     {
         sprite.second->Draw(m_camera);
+
+        if (m_showCollision)
+        {
+            sprite.second->DrawCollision(m_camera);
+        }
     }
 
     m_font->RenderText(
@@ -169,6 +167,18 @@ void Game::Render()
         glm::vec3(1.0F),
         m_camera
     );
+}
+
+void Game::RenderGUI()
+{
+    // Inspector window
+    if (ImGui::Begin("Debug Console"))
+    {
+        ImGui::SeparatorText("Debug Flags:");
+        ImGui::Checkbox("Show Collision", &m_showCollision);
+    }
+
+    ImGui::End();
 }
 
 void Game::Destroy()

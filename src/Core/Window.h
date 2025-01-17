@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 
 #include <memory>
 #include <exception>
@@ -49,6 +49,8 @@ protected:
     std::unique_ptr<Game> m_game;
 
 private:
+    void SetWindowIcon();
+
     GLFWwindow* m_handle;
     bool m_shouldClose = false;
 };

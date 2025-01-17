@@ -44,7 +44,7 @@ public:
     );
 
 private:
-    enum ShaderType
+    enum EShaderType
     {
         Vertex,
         Fragment,
@@ -52,5 +52,5 @@ private:
     };
 
     std::string ReadTextFile(const char* path);
-    void CheckCompilerErrors(unsigned int object, ShaderType type);
+    void CheckCompilerErrors(unsigned int object, EShaderType type);
 };

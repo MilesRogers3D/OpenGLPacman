@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 #include "Entity.h"
 
 Scene::Scene()
