@@ -9,8 +9,12 @@ class Scene
 public:
     Scene();
     ~Scene();
-
-protected:
+    
+    Entity CreateEntity(const std::string& name);
+    
+    entt::registry& GetRegistry();
+    
+private:
     entt::registry m_registry;
     std::string m_sceneName;
 };

@@ -1,6 +1,7 @@
 #include "Tilemap.h"
 
 #include "Core/Log.h"
+#include "Core/Scene/Components.h"
 
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -13,10 +14,12 @@ const unsigned FLIPPED_DIAGONALLY_FLAG    = 0x20000000;
 const unsigned ROTATED_HEXAGONAL_120_FLAG = 0x10000000;
 
 Tilemap::Tilemap(
+    const std::shared_ptr<Scene>& scene,
     const char* path,
-    const std::vector<std::shared_ptr<TileSprite>>& tileSprites,
+    const std::vector<TilemapInput>& tilemaps,
     int pixelsPerUnit)
 {
+    m_scene = scene;
     m_pixelsPerUnit = pixelsPerUnit;
 
     // Parse JSON file
@@ -30,7 +33,7 @@ Tilemap::Tilemap(
     if (tileWidth != tileHeight)
     {
         Log::Critical(
-            "Error loading tilemap! Non-square tiles not supported!"
+            "Error loading tilemap! Non-square tilemaps not supported!"
         );
     }
 
@@ -41,7 +44,7 @@ Tilemap::Tilemap(
         / (float)m_pixelsPerUnit * 100.0F;
 
     // Get first GIDs from each tile set
-    if (data["tilesets"].size() != tileSprites.size())
+    if (data["tilesets"].size() != tilemaps.size())
     {
         Log::Critical(
             "Incorrect amount of TileSprites loaded in texture array!"
@@ -49,7 +52,7 @@ Tilemap::Tilemap(
     }
 
     // Get tilesets and match them to their TileSprites
-    m_tileSets.clear();
+    m_tileSets.reserve(tilemaps.size());
     int tilesetIndex = 0;
 
     for (json::iterator it = data["tilesets"].begin();
@@ -59,15 +62,19 @@ Tilemap::Tilemap(
         Tileset tileset = {};
 
         tileset.FirstGID = it.value()["firstgid"];
-        tileset.TileSprite = tileSprites[tilesetIndex];
-        tileset.Length = tileSprites[tilesetIndex]->GetTileAmount();
-
+        tileset.TilemapData = tilemaps[tilesetIndex];
+        tileset.Length = tilemaps[tilesetIndex].Dimensions.x *
+            tilemaps[tilesetIndex].Dimensions.y;
+        
         m_tileSets.emplace_back(tileset);
+        
         tilesetIndex++;
     }
 
     // Get layers
     m_tileLayers.clear();
+    
+    int layerID = 0;
 
     for (json::iterator it = data["layers"].begin();
          it != data["layers"].end();
@@ -78,26 +85,24 @@ Tilemap::Tilemap(
         layer.Name = it.value()["name"];
         layer.Width = it.value()["width"];
         layer.Height = it.value()["height"];
-
-        std::vector<Tile> tiles;
-        tiles.clear();
-
+        
         std::vector<uint32_t> entries = it.value()["data"];
         auto* tileData = reinterpret_cast<unsigned char*>(entries.data());
-
-        int tileIndex = 0;
+        
+        std::vector<Entity> tileEntities;
+        tileEntities.reserve(entries.size());
 
         for (int i = 0; i < layer.Width; i ++)
         {
             for (int j = 0; j < layer.Height; j++)
             {
+                int tileIndex = (j * layer.Width + i) * 4;
+                
                 // Read the GID in little-endian byte order:
-                unsigned tileID = tileData[tileIndex] |
-                                  tileData[tileIndex + 1] << 8  |
-                                  tileData[tileIndex + 2] << 16 |
-                                  tileData[tileIndex + 3] << 24;
-
-                tileIndex += 4;
+                int tileID = tileData[tileIndex] |
+                             tileData[tileIndex + 1] << 8  |
+                             tileData[tileIndex + 2] << 16 |
+                             tileData[tileIndex + 3] << 24;
 
                 bool flippedH = (tileID & FLIPPED_HORIZONTALLY_FLAG);
                 bool flippedV = (tileID & FLIPPED_VERTICALLY_FLAG);
@@ -109,27 +114,74 @@ Tilemap::Tilemap(
                             FLIPPED_DIAGONALLY_FLAG |
                             ROTATED_HEXAGONAL_120_FLAG
                 );
-
-                Tile result = {};
-
-                result.ID = (int)tileID;
-                result.FlipHorizontal = flippedH;
-                result.FlipVertical = flippedV;
-                result.FlipDiagonal = flippedDiag;
-
-                tiles.emplace_back(result);
+                
+                if (tileID == 0)
+                {
+                    // No tile entity needs to be instantiated
+                    // if its tileID = 0
+                    continue;
+                }
+                
+                // Find correct tilemap input
+                int foundTilemap = (int)m_tileSets.size() - 1;
+                int foundTile = m_tileSets[foundTilemap].Length - 1;
+                
+                for (int k = 0; k < m_tileSets.size() - 1; k++)
+                {
+                    if (m_tileSets[k].FirstGID <= tileID &&
+                        m_tileSets[k + 1].FirstGID > tileID)
+                    {
+                        foundTile = (int)tileID - m_tileSets[k].FirstGID;
+                        foundTilemap = k;
+                        break;
+                    }
+                }
+                
+                // Create scene entity
+                
+                Entity result = m_scene.lock()->CreateEntity(
+                    std::format(
+                        "Layer{}Tile{}",
+                        layerID,
+                        j * layer.Width + i)
+                );
+                
+                auto& transform = result.GetComponent<TransformComponent>();
+                
+                transform.Position = glm::vec2(
+                    m_tileFootprint * (float)i,
+                    m_tileFootprint * (float)j
+                );
+                transform.Size = glm::vec2(m_tileFootprint);
+                
+                auto& spriteRenderer = result.AddComponent<SpriteRendererComponent>();
+                
+                spriteRenderer.SetTexture(tilemaps[foundTilemap].Texture);
+                spriteRenderer.FlipHorizontal = flippedH;
+                spriteRenderer.FlipVertical = flippedV;
+                spriteRenderer.FlipDiagonal = flippedDiag;
+                
+                auto& tileComponent = result.AddComponent<TileComponent>(
+                    tilemaps[foundTilemap].Dimensions
+                );
+                
+                tileComponent.TileIndex = foundTile;
+                
+                tileEntities.emplace_back(result);
             }
         }
 
-        layer.Tiles = tiles;
+        layer.TileEntities = tileEntities;
         m_tileLayers.emplace_back(layer);
+        
+        layerID += 1;
     }
 }
 
 void Tilemap::Draw(std::shared_ptr<Camera> &camera)
 {
     // Draw all tiles in right-down order
-    for (TileLayer layer : m_tileLayers)
+    /*for (TileLayer layer : m_tileLayers)
     {
         for (int i = 0; i < layer.Width; i++)
         {
@@ -193,5 +245,5 @@ void Tilemap::Draw(std::shared_ptr<Camera> &camera)
                 tileSprite->ResetTransform();
             }
         }
-    }
+    }*/
 }

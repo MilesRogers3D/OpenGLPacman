@@ -8,24 +8,24 @@
 class Entity
 {
 public:
-    explicit Entity(
-        const std::shared_ptr<Scene>& scene,
-        const std::string& name
+    Entity() = default;
+    Entity(
+        entt::entity handle,
+        const std::shared_ptr<Scene>& scene
     );
-
-    template<typename T>
-    bool HasComponent()
-    {
-        return m_scene->m_registry.any_of<T>(m_handle);
-    }
+    Entity(const Entity& other) = default;
+    
+    ~Entity() = default;
 
     template<typename T, typename ... Args>
     T& AddComponent(Args&& ... args)
     {
-        return m_scene->m_registry.emplace<T>(
+        T& component = m_scene->GetRegistry().emplace<T>(
             m_handle,
             std::forward<Args>(args) ...
         );
+        
+        return component;
     }
 
     template<typename T>
@@ -37,15 +37,20 @@ public:
                 "[Scene] Entity does not have component '%s'!",
                 typeid(T).name()
             );
-
-            return nullptr;
         }
-
-        return m_scene->m_registry.get<T>(m_handle);
+        
+        return m_scene->GetRegistry().get<T>(m_handle);
     }
-
+    
+    template<typename T>
+    bool HasComponent()
+    {
+        return m_scene->GetRegistry().any_of<T>(m_handle);
+    }
+    
+    void OnGUIDraw();
 
 private:
-    entt::entity m_handle;
+    entt::entity m_handle = entt::null;
     std::shared_ptr<Scene> m_scene;
 };

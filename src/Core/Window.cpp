@@ -2,9 +2,9 @@
 
 #include "Log.h"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <stb_image.h>
 
@@ -104,11 +104,10 @@ void Window::InitWindow(int width, int height)
 
     if (m_handle == nullptr)
     {
-        throw std::exception(
+        Log::Critical(
             "Unable to create GLFW window!"
         );
         glfwTerminate();
-        exit(1);
     }
 
     glfwMakeContextCurrent(m_handle);
@@ -125,10 +124,9 @@ void Window::InitWindow(int width, int height)
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        throw std::exception(
-        "Unable to initialize GLAD!"
+        Log::Critical(
+            "Unable to initialize GLAD!"
         );
-        exit(1);
     }
 
     // Enable debug callbacks
@@ -168,6 +166,8 @@ void Window::WindowLoop()
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    
+    SetImGuiTheme();
 
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -225,6 +225,17 @@ void Window::WindowLoop()
 GLFWwindow* Window::GetWindowHandle()
 {
     return m_handle;
+}
+
+void Window::SetImGuiTheme()
+{
+    // Set font
+    ImGuiIO& io = ImGui::GetIO();
+    
+    ImFont* font = io.Fonts->AddFontFromFileTTF("./res/fonts/debug/inter.ttf", 16);
+    
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGui::StyleColorsDark();
 }
 
 

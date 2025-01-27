@@ -50,6 +50,7 @@ protected:
 
 private:
     void SetWindowIcon();
+    void SetImGuiTheme();
 
     GLFWwindow* m_handle;
     bool m_shouldClose = false;

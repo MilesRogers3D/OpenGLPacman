@@ -6,6 +6,10 @@
 #include "Entities/Pacman.h"
 #include "Rendering/Font/BitmapFont.h"
 #include "Rendering/Debug/DebugShapes.h"
+#include "Core/Scene/Entity.h"
+#include "Core/Scene/Scene.h"
+#include "Core/Scene/Components.h"
+#include "IO/Tilemap/Tilemap.h"
 
 #include <imgui.h>
 #include <glad/glad.h>
@@ -22,6 +26,8 @@ Game::Game(Window* window)
 {
     std::shared_ptr<Window> windowPtr(window);
     m_window = windowPtr;
+    
+    m_scene = std::make_shared<Scene>();
 }
 
 void Game::Init()
@@ -50,6 +56,9 @@ void Game::Init()
         fontTex,
         "res/fonts/font.json"
     );
+    
+    // Renderer setup
+    m_renderer = std::make_shared<Renderer>(m_scene);
 
     // Ghost sprite setup
     auto ghostTex = ResourceManager::LoadTexture("res/sprites/ghost.png", "Blinky");
@@ -60,64 +69,78 @@ void Game::Init()
         {
             std::string name = "Blinky" + std::to_string(5 * i + j);
             glm::vec2 pos = glm::vec2(100.0F) + (glm::vec2((float)i, (float)j) * 50.0F);
-
+            
             Log::Info("Creating sprite %s at [%f, %f]",
                 name.c_str(),
                 pos.x,
                 pos.y
             );
-
-            m_sprites[name] = std::make_shared<Sprite>(
-                ghostTex,
-                pos,
-                glm::vec2(56.0F),
-                glm::vec3(1.0F)
-            );
-            m_sprites[name]->SetCollisionEnabled(true);
-            m_sprites[name]->SetDrawCollision(true);
+            
+            Entity ghostEntity = m_scene->CreateEntity(name);
+            
+            SpriteRendererComponent srCompData = {};
+            
+            srCompData.SetTexture(ghostTex);
+            srCompData.ColorTint = glm::vec4(1.0F);
+            
+            ghostEntity.AddComponent<SpriteRendererComponent>(ghostTex, glm::vec4(1.0F));
+            ghostEntity.AddComponent<BoxColliderComponent>().DrawDebugCollision = true;
+            
+            auto& t = ghostEntity.GetComponent<TransformComponent>();
+            
+            t.Position = glm::vec2(100.0F) + (glm::vec2((float)i, (float)j) * 50.0F);
+            t.Size = glm::vec2(56.0F);
+            
+            m_entities.emplace_back(ghostEntity);
         }
     }
 
     // Maze setup
-    std::vector<std::shared_ptr<TileSprite>> tileSprites;
-    tileSprites.clear();
+    std::vector<TilemapInput> tilemaps;
+    tilemaps.reserve(3);
 
     auto mazeTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
     auto dotTex = ResourceManager::LoadTexture("res/sprites/dots.png", "MazeTileset");
     auto debugTex = ResourceManager::LoadTexture("res/sprites/maze_tileset.png", "MazeTileset");
 
-    tileSprites.emplace_back(std::make_shared<TileSprite>(
-        glm::ivec2(6, 2),
-        mazeTex
-    ));
-    tileSprites.emplace_back(std::make_shared<TileSprite>(
-        glm::ivec2(2, 1),
-        dotTex
-    ));
-    tileSprites.emplace_back(std::make_shared<TileSprite>(
-        glm::ivec2(1, 1),
-        debugTex
-    ));
+    TilemapInput mazeTilemap = {};
+    mazeTilemap.Dimensions = glm::ivec2(6, 2);
+    mazeTilemap.Texture = mazeTex;
+    
+    TilemapInput dotTilemap = {};
+    dotTilemap.Dimensions = glm::ivec2(2, 1);
+    dotTilemap.Texture = dotTex;
+    
+    TilemapInput debugTilemap = {};
+    debugTilemap.Dimensions = glm::ivec2(1, 1);
+    debugTilemap.Texture = debugTex;
+    
+    tilemaps.emplace_back(mazeTilemap);
+    tilemaps.emplace_back(dotTilemap);
+    tilemaps.emplace_back(debugTilemap);
 
     m_tileMap = std::make_shared<Tilemap>(
+        m_scene,
         "res/maps/level.json",
-        tileSprites,
+        tilemaps,
         25
     );
 
     // Pacman animated sprite setup
     auto pacmanTex = ResourceManager::LoadTexture("res/sprites/pacman.png", "Pacman");
 
-    m_sprites["Pacman"] = std::make_shared<Pacman>(
-        3,
-        0.1F,
-        pacmanTex,
-        glm::vec2(425.0F, 630.0F),
-        glm::vec2(52.0F),
-        glm::vec3(1.0F)
-    );
-    m_sprites["Pacman"]->SetCollisionEnabled(true);
-    m_sprites["Pacman"]->SetDrawCollision(true);
+    Entity pacman = m_scene->CreateEntity("Pacman");
+    
+    pacman.AddComponent<SpriteRendererComponent>(pacmanTex, glm::vec4(1.0F));
+    pacman.AddComponent<FlipbookComponent>(3, 0.1F);
+    pacman.AddComponent<BoxColliderComponent>().DrawDebugCollision = true;
+    
+    auto& transform = pacman.GetComponent<TransformComponent>();
+    
+    transform.Position = glm::vec2(425.0F, 630.0F);
+    transform.Size = glm::vec2(52.0F);
+    
+    m_entities.emplace_back(pacman);
 
     // Play intro sound
     if (!muteGame)
@@ -139,45 +162,80 @@ void Game::Render()
     // Game rendering
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    m_tileMap->Draw(m_camera);
-
-    for (auto sprite : m_sprites)
-    {
-        sprite.second->Draw(m_camera);
-
-        if (m_showCollision)
-        {
-            sprite.second->DrawCollision(m_camera);
-        }
-    }
-
-    m_font->RenderText(
-        "HELLO PAC-MAN! - # 500 @$",
-        glm::vec2(10.0F),
-        3.0F,
-        glm::vec3(1.0F),
-        m_camera
-    );
-
-    m_font->RenderText(
-        m_showCollision ? "COLLISION VIEW ENABLED" : "COLLISION VIEW DISABLED",
-        glm::vec2(10.0F, 45.0F),
-        1.0F,
-        glm::vec3(1.0F),
-        m_camera
-    );
+    
+    m_renderer->RenderSprites(m_camera);
 }
 
 void Game::RenderGUI()
 {
-    // Inspector window
+    // Debug flags window
     if (ImGui::Begin("Debug Console"))
     {
         ImGui::SeparatorText("Debug Flags:");
         ImGui::Checkbox("Show Collision", &m_showCollision);
     }
-
+    
+    ImGui::End();
+    
+    // Entity list window
+    int selectedItem = 0;
+    bool itemFound = false;
+    
+    if (ImGui::Begin("Entity List"))
+    {
+        m_scene->GetRegistry().sort<NameComponent>([](
+            const NameComponent& lhs,
+            const NameComponent& rhs)
+        {
+            return lhs.Name < rhs.Name;
+        });
+        
+        auto entities = m_scene->GetRegistry().view<NameComponent>();
+        
+        for (auto entity : entities)
+        {
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+            
+            if (selectedItem == m_selectedEditorItem)
+            {
+                flags |= ImGuiTreeNodeFlags_Selected;
+            }
+            
+            if (ImGui::TreeNodeEx(
+                m_scene->GetRegistry().get<NameComponent>(entity).Name.c_str(),
+                flags))
+            {
+                if (ImGui::IsItemClicked())
+                {
+                    itemFound = true;
+                    m_selectedEditorItem = selectedItem;
+                }
+                
+                if (!itemFound)
+                {
+                    selectedItem += 1;
+                }
+                
+                ImGui::TreePop();
+            }
+        }
+    }
+    
+    ImGui::End();
+    
+    // Inspector window
+    if (ImGui::Begin("Inspector"))
+    {
+        if (itemFound)
+        {
+            ImGui::SeparatorText(
+                m_entities[m_selectedEditorItem].
+                    GetComponent<NameComponent>().Name.c_str()
+            );
+            m_entities[m_selectedEditorItem].OnGUIDraw();
+        }
+    }
+    
     ImGui::End();
 }
 

@@ -41,6 +41,8 @@ add_executable(${PROJECT_NAME}
         src/Core/Scene/Components.h
         src/Rendering/Debug/DebugShapes.cpp
         src/Rendering/Debug/DebugShapes.h
+        src/Core/Systems/Renderer.cpp
+        src/Core/Systems/Renderer.h
 )
 
 include_directories(${PROJECT_NAME}
