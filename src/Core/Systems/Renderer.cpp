@@ -2,6 +2,7 @@
 #include "Core/Scene/Components.h"
 #include "IO/ResourceManager.h"
 #include "Rendering/Debug/DebugShapes.h"
+#include "Rendering/Font/BitmapFont.h"
 #include "Core/Log.h"
 
 #include <entt/entt.hpp>
@@ -17,6 +18,12 @@ Renderer::Renderer(const std::shared_ptr<Scene> &scene)
         "res/shaders/sprite.frag",
         "SpriteShader"
     );
+    
+    m_fontShader = ResourceManager::LoadShader(
+        "res/shaders/font.vert",
+        "res/shaders/font.frag",
+        "FontShader"
+    );
 }
 
 Renderer::~Renderer()
@@ -27,6 +34,7 @@ Renderer::~Renderer()
 void Renderer::RenderSprites(const std::shared_ptr<Camera>& camera)
 {
     auto shader = m_spriteShader.lock();
+    glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
     
     // Render every component in scene with the required data
     auto scene = m_scene.lock();
@@ -214,9 +222,81 @@ void Renderer::RenderSprites(const std::shared_ptr<Camera>& camera)
     }
 }
 
+void Renderer::RenderFonts(const std::shared_ptr<Camera> &camera)
+{
+    auto scene = m_scene.lock();
+    auto shader = m_fontShader.lock();
+    
+    shader->Use();
+    shader->SetMat4("projection", camera->GetProjection());
+    
+    auto view = scene->GetRegistry().view<
+        const TransformComponent,
+        const FontRendererComponent
+    >();
+    
+    for (const auto& [entity, transform, fontRenderer] : view.each())
+    {
+        shader->SetVec3("textColor", fontRenderer.Color);
+        
+        glActiveTexture(GL_TEXTURE0);
+        fontRenderer.Font.lock()->BindTexture();
+        
+        shader->SetInt("text", 0);
+        
+        auto bitmapFont = fontRenderer.Font.lock();
+        glm::vec2 position = transform.Position;
+        
+        glBindVertexArray(bitmapFont->GetVAO());
+        
+        std::string text = fontRenderer.Text;
+        
+        // Make uppercase so it can be read by the font parser
+        std::transform(text.begin(), text.end(), text.begin(), ::toupper);
+        
+        for (char& c : text)
+        {
+            Character ch = bitmapFont->GetCharacter(c);
+            
+            float w = (float)ch.Size.x * fontRenderer.FontSize;
+            float h = (float)ch.Size.y * fontRenderer.FontSize;
+            
+            auto texture = bitmapFont->GetTexture();
+            
+            float u1 =   (float)ch.Bearing.x / (float)texture->Width;
+            float u2 =  ((float)ch.Bearing.x + (float)ch.Size.x)
+                       / (float)texture->Width;
+            float v1 =  ((float)ch.Bearing.y + (float)ch.Size.y)
+                       / (float)texture->Height;
+            float v2 =   (float)ch.Bearing.y / (float)texture->Height;
+            
+            float vertices[6][4] =
+            {
+                { position.x,     position.y + h,   u1, v1 },
+                { position.x,     position.y,       u1, v2 },
+                { position.x + w, position.y,       u2, v2 },
+                
+                { position.x,     position.y + h,   u1, v1 },
+                { position.x + w, position.y,       u2, v2 },
+                { position.x + w, position.y + h,   u2, v1 }
+            };
+            
+            glBindBuffer(GL_ARRAY_BUFFER, bitmapFont->GetVBO());
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            
+            position.x += ((float)ch.Size.x + (float)ch.Advance) *
+                fontRenderer.FontSize;
+        }
+        
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+}
+
 void Renderer::SetupRenderQuad()
 {
-    unsigned int VBO;
     float vertices[] =
     {
         // Pos      // UV
@@ -230,12 +310,12 @@ void Renderer::SetupRenderQuad()
     };
     
     glGenVertexArrays(1, &m_quadVAO);
-    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &m_quadVBO);
     
     glGenVertexArrays(1, &m_quadVAO);
-    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &m_quadVBO);
     
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
     glBufferData(
         GL_ARRAY_BUFFER,
         sizeof(vertices),

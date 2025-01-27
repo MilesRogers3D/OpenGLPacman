@@ -9,8 +9,17 @@
 #include <memory>
 #include <utility>
 
+struct Character
+{
+    unsigned int TextureId;
+    glm::ivec2 Size;
+    glm::ivec2 Bearing;
+    unsigned int Advance;
+};
+
 class BitmapFont
 {
+    friend class Renderer;
 public:
     void LoadFont(
         std::shared_ptr<Texture>& texture,
@@ -24,20 +33,24 @@ public:
         glm::vec3 color,
         std::shared_ptr<Camera>& camera
     );
+    
+    void BindTexture();
 
     BitmapFont() = default;
     ~BitmapFont() = default;
-
+    
+protected:
+    Character GetCharacter(char character);
+    
+    [[nodiscard]]
+    const std::shared_ptr<Texture>& GetTexture() const;
+    
+    [[nodiscard]]
+    unsigned int GetVAO() const;
+    [[nodiscard]]
+    unsigned int GetVBO() const;
+    
 private:
-
-    struct Character
-    {
-        unsigned int TextureId;
-        glm::ivec2 Size;
-        glm::ivec2 Bearing;
-        unsigned int Advance;
-    };
-
     std::map<char, Character> m_characters;
 
     std::shared_ptr<Texture> m_texture;

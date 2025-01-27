@@ -113,3 +113,28 @@ void BitmapFont::RenderText(
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+void BitmapFont::BindTexture()
+{
+    m_texture->Bind();
+}
+
+Character BitmapFont::GetCharacter(char character)
+{
+    return m_characters[character];
+}
+
+const std::shared_ptr<Texture>& BitmapFont::GetTexture() const
+{
+    return m_texture;
+}
+
+unsigned int BitmapFont::GetVAO() const
+{
+    return m_VAO;
+}
+
+unsigned int BitmapFont::GetVBO() const
+{
+    return m_VBO;
+}

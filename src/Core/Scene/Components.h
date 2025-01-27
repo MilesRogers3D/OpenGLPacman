@@ -160,14 +160,15 @@ struct FontRendererComponent
 {
     std::string Text;
     std::weak_ptr<BitmapFont> Font;
+    glm::vec4 Color = glm::vec4(1.0F);
     
-    int FontSize = 8;
+    float FontSize = 8.0F;
     
     FontRendererComponent() = default;
     FontRendererComponent(
         std::string text,
         const std::shared_ptr<BitmapFont>& font,
-        int size)
+        float size)
             : Text(std::move(text)),
               Font(font),
               FontSize(size) {}

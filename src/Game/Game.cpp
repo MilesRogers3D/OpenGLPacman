@@ -47,6 +47,7 @@ void Game::Init()
     // Audio emitter setup
     m_audioEmitter = std::make_shared<AudioEmitter>();
 
+    // Font entity setup
     auto fontTex = ResourceManager::LoadTexture(
         "res/fonts/font.png",
         "FontTexture"
@@ -56,6 +57,19 @@ void Game::Init()
         fontTex,
         "res/fonts/font.json"
     );
+    
+    Entity fontEntity = m_scene->CreateEntity("FontEntity");
+    
+    auto& fontTransform = fontEntity.GetComponent<TransformComponent>();
+    fontTransform.Position = glm::vec2(2.0F);
+    
+    auto& fontRenderer = fontEntity.AddComponent<FontRendererComponent>(
+        "Hello world!",
+        m_font,
+        4.0F
+    );
+    
+    m_entities.emplace_back(fontEntity);
     
     // Renderer setup
     m_renderer = std::make_shared<Renderer>(m_scene);
@@ -164,6 +178,7 @@ void Game::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     m_renderer->RenderSprites(m_camera);
+    m_renderer->RenderFonts(m_camera);
 }
 
 void Game::RenderGUI()
