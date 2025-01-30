@@ -237,7 +237,7 @@ void Renderer::RenderFonts(const std::shared_ptr<Camera> &camera)
     
     for (const auto& [entity, transform, fontRenderer] : view.each())
     {
-        shader->SetVec3("textColor", fontRenderer.Color);
+        shader->SetVec3("textColor", fontRenderer.FontColor);
         
         glActiveTexture(GL_TEXTURE0);
         fontRenderer.Font.lock()->BindTexture();

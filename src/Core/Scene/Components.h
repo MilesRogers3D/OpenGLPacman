@@ -9,6 +9,8 @@
 #include <string>
 #include <utility>
 
+typedef glm::vec4 Color;
+
 struct NameComponent
 {
     std::string Name;
@@ -36,7 +38,13 @@ struct TagComponent
 struct TransformComponent
 {
     glm::vec2 Position = { 0.0F, 0.0F };
+    
     float Rotation = 0.0F;
+    void SetRotation(float rotation)
+    {
+        Rotation = glm::radians(rotation);
+    }
+    
     glm::vec2 Size = { 100.0F, 100.0F };
 
     glm::vec2 Pivot = { 0.5F, 0.5F };
@@ -54,7 +62,7 @@ struct TransformComponent
 
 struct SpriteRendererComponent
 {
-    glm::vec4 ColorTint = { 1.0F, 1.0F, 1.0F, 1.0F };
+    Color ColorTint = { 1.0F, 1.0F, 1.0F, 1.0F };
 
     bool FlipHorizontal = false;
     bool FlipVertical = false;
@@ -64,7 +72,7 @@ struct SpriteRendererComponent
     
     SpriteRendererComponent(
         const std::shared_ptr<Texture>& texture,
-        glm::vec4 color)
+        Color color)
     {
         m_spriteTexture = texture;
         m_hasTexture = true;
@@ -72,7 +80,7 @@ struct SpriteRendererComponent
         ColorTint = color;
     }
     
-    SpriteRendererComponent(glm::vec4 color)
+    SpriteRendererComponent(Color color)
     {
         ColorTint = color;
     }
@@ -160,7 +168,7 @@ struct FontRendererComponent
 {
     std::string Text;
     std::weak_ptr<BitmapFont> Font;
-    glm::vec4 Color = glm::vec4(1.0F);
+    Color FontColor = Color(1.0F);
     
     float FontSize = 8.0F;
     

@@ -1,25 +1,23 @@
 #pragma once
 
 #include "Rendering/Sprite/AnimatedSprite.h"
-#include "Core/Scene/Scene.h"
+#include "Core/Scene/Entity.h"
 
-class Pacman : public AnimatedSprite
+class Pacman
 {
 public:
     explicit Pacman(
-        int divisions,
-        float frameDuration,
-        std::shared_ptr<Texture>& texture,
-        glm::vec2 position = glm::vec2(0.0F),
-        glm::vec2 size = glm::vec2(10.0F, 10.0F),
-        glm::vec3 color = glm::vec3(1.0F)
+        const std::shared_ptr<Scene>& scene
     );
+    
+    void OnUpdate(float deltaTime);
 
     void OnKeyPressed(int key);
     void OnKeyReleased(int key);
 
-    void Update(float deltaTime) override;
-
 private:
+    Entity m_entity;
     glm::vec2 m_input = glm::vec2(0.0F);
+    
+    std::weak_ptr<Scene> m_scene;
 };

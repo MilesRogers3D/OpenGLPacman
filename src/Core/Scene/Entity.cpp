@@ -37,3 +37,8 @@ void Entity::OnGUIDraw()
     transform.Rotation = rotation;
     transform.Size = glm::vec2(size[0], size[1]);
 }
+
+void Entity::OnUpdate(float deltaTime)
+{
+
+}

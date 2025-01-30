@@ -13,7 +13,8 @@ Scene::~Scene()
 
 }
 
-Entity Scene::CreateEntity(const std::string& name)
+Entity Scene::CreateEntity(
+    const std::string& name)
 {
     std::shared_ptr<Scene> scenePtr(this);
     

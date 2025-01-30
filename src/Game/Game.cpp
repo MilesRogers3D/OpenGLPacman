@@ -64,9 +64,9 @@ void Game::Init()
     fontTransform.Position = glm::vec2(2.0F);
     
     auto& fontRenderer = fontEntity.AddComponent<FontRendererComponent>(
-        "Hello world!",
+        "Hello Font Renderer!",
         m_font,
-        4.0F
+        3.0F
     );
     
     m_entities.emplace_back(fontEntity);
@@ -141,20 +141,7 @@ void Game::Init()
     );
 
     // Pacman animated sprite setup
-    auto pacmanTex = ResourceManager::LoadTexture("res/sprites/pacman.png", "Pacman");
-
-    Entity pacman = m_scene->CreateEntity("Pacman");
-    
-    pacman.AddComponent<SpriteRendererComponent>(pacmanTex, glm::vec4(1.0F));
-    pacman.AddComponent<FlipbookComponent>(3, 0.1F);
-    pacman.AddComponent<BoxColliderComponent>().DrawDebugCollision = true;
-    
-    auto& transform = pacman.GetComponent<TransformComponent>();
-    
-    transform.Position = glm::vec2(425.0F, 630.0F);
-    transform.Size = glm::vec2(52.0F);
-    
-    m_entities.emplace_back(pacman);
+    m_pacman = std::make_unique<Pacman>(m_scene);
 
     // Play intro sound
     if (!muteGame)
@@ -165,9 +152,11 @@ void Game::Init()
 
 void Game::Update(float deltaTime)
 {
-    for (auto sprite : m_sprites)
+    m_pacman->OnUpdate(deltaTime);
+    
+    for (Entity entity : m_entities)
     {
-        sprite.second->Update(deltaTime);
+        entity.OnUpdate(deltaTime);
     }
 }
 
@@ -211,26 +200,10 @@ void Game::RenderGUI()
         {
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
             
-            if (selectedItem == m_selectedEditorItem)
-            {
-                flags |= ImGuiTreeNodeFlags_Selected;
-            }
-            
             if (ImGui::TreeNodeEx(
                 m_scene->GetRegistry().get<NameComponent>(entity).Name.c_str(),
                 flags))
             {
-                if (ImGui::IsItemClicked())
-                {
-                    itemFound = true;
-                    m_selectedEditorItem = selectedItem;
-                }
-                
-                if (!itemFound)
-                {
-                    selectedItem += 1;
-                }
-                
                 ImGui::TreePop();
             }
         }
@@ -269,32 +242,16 @@ void Game::OnKeyPressed(int key)
         // TODO: Add pausing
         exit(1);
     }
-
-    for (auto sprite : m_sprites)
-    {
-        if (Pacman* character = dynamic_cast<Pacman*>(
-            sprite.second.get()))
-        {
-            character->OnKeyPressed(key);
-        }
-    }
-
-    m_audioEmitter->Play("res/audio/sfx/chomp.wav");
+    
+    m_pacman->OnKeyPressed(key);
 
     Log::Info("Key pressed: %i", key);
 }
 
 void Game::OnKeyReleased(int key)
 {
-    for (auto sprite : m_sprites)
-    {
-        if (Pacman* character =
-            dynamic_cast<Pacman*>(sprite.second.get()))
-        {
-            character->OnKeyReleased(key);
-        }
-    }
-
+    m_pacman->OnKeyReleased(key);
+    
     Log::Info("Key released: %i", key);
 }
 

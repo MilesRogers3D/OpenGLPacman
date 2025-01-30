@@ -7,7 +7,7 @@
 #include "Rendering/Font/BitmapFont.h"
 #include "IO/Audio/AudioEmitter.h"
 #include "IO/Tilemap/Tilemap.h"
-
+#include "Game/Entities/Pacman.h"
 
 class Game
 {
@@ -38,6 +38,8 @@ private:
 
     std::shared_ptr<Window> m_window;
     std::shared_ptr<Scene> m_scene;
+    
+    std::unique_ptr<Pacman> m_pacman;
 
     static std::map<std::string, std::shared_ptr<Sprite>> m_sprites;
     std::vector<Entity> m_entities;

@@ -48,9 +48,10 @@ public:
         return m_scene->GetRegistry().any_of<T>(m_handle);
     }
     
+    virtual void OnUpdate(float deltaTime);
     void OnGUIDraw();
 
-private:
+protected:
     entt::entity m_handle = entt::null;
     std::shared_ptr<Scene> m_scene;
 };
